@@ -1,59 +1,265 @@
 <!DOCTYPE html>
-<html>
+<html style="height: 100%">
 
 <head>
     <meta charset="utf-8">
-    <!-- 引入 ECharts 文件 -->
-    <script src="static/echarts.js"></script>
+    <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/echarts.min.js"></script>
+    <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts-gl/echarts-gl.min.js"></script>
+    <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts-stat/ecStat.min.js"></script>
+    <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/extension/dataTool.min.js"></script>
+    <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/china.js"></script>
+    <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/map/js/world.js"></script>
+    <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=ZUONbpqGBsYGXNIYHicvbAbM"></script>
+    <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/extension/bmap.min.js"></script>
+    <script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/simplex.js"></script>
+    <script type="text/javascript" src="static/jquery.js"></script>
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
 </head>
 
-<body>
-    <div id="main" style="width: 600px;height:400px;"></div>
-    <script type="text/javascript">
-        var myChart = echarts.init(document.getElementById('main'))
-        var option = {
-            title: {
-                text: 'Echarts入门实例'
-            },
-            tooltip: {},
-            legend: {
-                data: ['销量']
-            },
-            xAxis: {
-                data: ["衬衫", "羊毛衫", "雪纺衫", "裤子", "高跟鞋", "袜子"]
-            },
-            yAxis: {},
-            series: [{
-                name: '销量',
-                type: 'bar',
-                data: [5, 20, 36, 10, 10, 20]
-            }]
-        }
-        // myChart.setOption(option)
-        myChart.setOption({
-            series: [
+<body style="height: 100%; margin: 0">
+    <div id="echarts" style="height: 100%; position: relative;"></div>
+    <div id="app" style="position: absolute; bottom: 0; left: 0;">
+        <template>
+            <el-table :data="tableData2" style="width: 100%" :row-class-name="tableRowClassName">
+                <el-table-column prop="sourceIP" label="sourceIP" width="180">
+                </el-table-column>
+                <el-table-column prop="targetIP" label="targetIP" width="180">
+                </el-table-column>
+                <el-table-column prop="event" label="event">
+                </el-table-column>
+            </el-table>
+        </template>
+    </div>
+</body>
+
+
+<!-- import Vue before Element -->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+<script>
+    var dom = document.getElementById("echarts")
+    var mapEcharts = echarts.init(dom)
+    var planePath = 'path://M1705.06,1318.313v-89.254l-319.9-221.799l0.073-208.063c0.521-84.662-26.629-121.796-63.961-121.491c-37.332-0.305-64.482,36.829-63.961,121.491l0.073,208.063l-319.9,221.799v89.254l330.343-157.288l12.238,241.308l-134.449,92.931l0.531,42.034l175.125-42.917l175.125,42.917l0.531-42.034l-134.449-92.931l12.238-241.308L1705.06,1318.313z'
+    var bmapConfig = {
+        center: [80.46, 39.92],
+        zlevel: 1,
+        zoom: 4,
+        roam: true,
+        mapStyle: {
+            styleJson: [
                 {
-                    name: '访问来源',
-                    type: 'pie',
-                    roseType: 'angle',
-                    radius: '55%',
-                    data: [
-                        { value: 235, name: '视频广告' },
-                        { value: 274, name: '联盟广告' },
-                        { value: 310, name: '邮件营销' },
-                        { value: 335, name: '直接访问' },
-                        { value: 400, name: '搜索引擎' }
-                    ],
-                    itemStyle: {
-                        shadowBlur: 200,
-                        shadowOffsetX: 0,
-                        shadowOffsetY: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.5)'
+                    "featureType": "water",
+                    "elementType": "all",
+                    "stylers": {
+                        "color": "#044161"
+                    }
+                },
+                {
+                    "featureType": "land",
+                    "elementType": "all",
+                    "stylers": {
+                        "color": "#004981"
+                    }
+                },
+                {
+                    "featureType": "boundary",
+                    "elementType": "geometry",
+                    "stylers": {
+                        "color": "#064f85"
+                    }
+                },
+                {
+                    "featureType": "railway",
+                    "elementType": "all",
+                    "stylers": {
+                        "visibility": "off"
+                    }
+                },
+                {
+                    "featureType": "highway",
+                    "elementType": "geometry",
+                    "stylers": {
+                        "color": "#004981"
+                    }
+                },
+                {
+                    "featureType": "highway",
+                    "elementType": "geometry.fill",
+                    "stylers": {
+                        "color": "#005b96",
+                        "lightness": 1
+                    }
+                },
+                {
+                    "featureType": "highway",
+                    "elementType": "labels",
+                    "stylers": {
+                        "visibility": "off"
+                    }
+                },
+                {
+                    "featureType": "arterial",
+                    "elementType": "geometry",
+                    "stylers": {
+                        "color": "#004981"
+                    }
+                },
+                {
+                    "featureType": "arterial",
+                    "elementType": "geometry.fill",
+                    "stylers": {
+                        "color": "#00508b"
+                    }
+                },
+                {
+                    "featureType": "poi",
+                    "elementType": "all",
+                    "stylers": {
+                        "visibility": "off"
+                    }
+                },
+                {
+                    "featureType": "green",
+                    "elementType": "all",
+                    "stylers": {
+                        "color": "#056197",
+                        "visibility": "off"
+                    }
+                },
+                {
+                    "featureType": "subway",
+                    "elementType": "all",
+                    "stylers": {
+                        "visibility": "off"
+                    }
+                },
+                {
+                    "featureType": "manmade",
+                    "elementType": "all",
+                    "stylers": {
+                        "visibility": "off"
+                    }
+                },
+                {
+                    "featureType": "local",
+                    "elementType": "all",
+                    "stylers": {
+                        "visibility": "off"
+                    }
+                },
+                {
+                    "featureType": "arterial",
+                    "elementType": "labels",
+                    "stylers": {
+                        "visibility": "off"
+                    }
+                },
+                {
+                    "featureType": "boundary",
+                    "elementType": "geometry.fill",
+                    "stylers": {
+                        "color": "#029fd4"
+                    }
+                },
+                {
+                    "featureType": "building",
+                    "elementType": "all",
+                    "stylers": {
+                        "color": "#1a5787"
                     }
                 }
             ]
+        }
+    }
+    var lineConfig = {
+        type: 'lines',
+        coordinateSystem: 'bmap',
+        data: null,
+        silent: true,
+        effect: {
+            show: true,
+            period: 6,
+            trailLength: 0.7,
+            symbol: planePath,
+            symbolSize: 12
+        },
+        lineStyle: {
+            normal: {
+                opacity: 0.5,
+                width: 1,
+                curveness: 0.2
+            }
+        },
+        progressiveThreshold: 500,
+        progressive: 200
+    }
+    var pointConfig = {
+        name: '你猜',
+        type: 'effectScatter',
+        coordinateSystem: 'bmap',
+        zlevel: 2,
+        rippleEffect: {
+            brushType: 'stroke'
+        },
+        label: {
+            normal: {
+                show: true,
+                position: 'right',
+                formatter: function (params) {
+                    return params.value[2]
+                }
+            }
+        },
+        symbolSize: function (val) {
+            return val[2] / 10
+        },
+        itemStyle: {
+            normal: {
+                color: 'orange'
+            }
+        },
+        data: [{ name: 'wokao', value: [[116.4383, 40.1471], [116.4971, 39.9078]] }]
+    }
+
+    var app = {}
+    option = null
+    app.title = '恶意流量分析图'
+
+
+    $.get('data', function (data) {
+        var Main = {
+            methods: {
+                tableRowClassName({ row, rowIndex }) {
+                    if (rowIndex === 1) {
+                        return 'warning-row';
+                    } else if (rowIndex === 3) {
+                        return 'success-row';
+                    }
+                    return '';
+                }
+            },
+            data() {
+                return {
+                    tableData2: data.origin
+                }
+            }
+        }
+        var Ctor = Vue.extend(Main)
+        new Ctor().$mount('#app')
+        lineConfig.data = data.echarts
+        mapEcharts.setOption(option = {
+            bmap: bmapConfig,
+            series: [lineConfig]
         })
-    </script>
-</body>
+
+    })
+    if (option && typeof option === "object") {
+        mapEcharts.setOption(option, true)
+    }
+
+</script>
 
 </html>

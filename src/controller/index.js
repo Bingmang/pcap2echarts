@@ -1,3 +1,4 @@
 module.exports = {
-    '/': require('./root')
+    '/': require('./root'),
+    '/data': require('./data')
 }

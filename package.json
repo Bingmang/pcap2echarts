@@ -23,6 +23,8 @@
   },
   "homepage": "https://github.com/Bingmang/pcap2echarts#readme",
   "dependencies": {
+    "geoip-lite": "^1.3.2",
+    "ip-location": "^1.0.1",
     "koa": "^2.5.3",
     "koa-router": "^7.4.0",
     "koa-static": "^5.0.0",
